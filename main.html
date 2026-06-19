@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vesper-Xmd Session</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-image: url("https://i.ibb.co/pBbsqnJf/ac09079ffdcb.jpg");
+      background-size: cover;
+      background-position: center;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    /* Logo container */
+    .logo-container {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .logo-img {
+      width: 90px;
+      height: 90px;
+      object-fit: contain;
+      border-radius: 50%;
+      border: 3px solid #1a6fd4;
+      padding: 5px;
+      background: rgba(0,0,0,0.6);
+      box-shadow: 0 0 20px rgba(26,111,212,0.5);
+    }
+
+    .btn {
+      --color: #e5f5f1;
+      --color2: rgb(0, 0, 0);
+      width: 220px;
+      padding: 0.8em 1.75em;
+      background-color: #1a6fd4;
+      border-radius: 6px;
+      border: .3px solid var(--color);
+      transition: .5s;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      z-index: 1;
+      font-weight: 300;
+      font-size: 17px;
+      font-family: 'Roboto', 'Segoe UI', sans-serif;
+      text-transform: uppercase;
+      color: var(--color);
+      margin-bottom: 24px;
+      display: block;
+      text-align: center;
+    }
+
+    .btn::after, .btn::before {
+      content: '';
+      display: block;
+      height: 100%;
+      width: 100%;
+      transform: skew(90deg) translate(-50%, -50%);
+      position: absolute;
+      inset: 50%;
+      left: 25%;
+      z-index: -1;
+      transition: .5s ease-out;
+      background-color: var(--color);
+    }
+
+    .btn::before {
+      top: -50%;
+      left: -25%;
+      transform: skew(90deg) rotate(180deg) translate(-50%, -50%);
+    }
+
+    .btn:hover::before {
+      transform: skew(45deg) rotate(180deg) translate(-50%, -50%);
+    }
+
+    .btn:hover::after {
+      transform: skew(45deg) translate(-50%, -50%);
+    }
+
+    .btn:hover {
+      color: var(--color2);
+    }
+
+    .btn:active {
+      filter: brightness(.7);
+      transform: scale(.98);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="logo-container">
+    <img class="logo-img" src="https://files.catbox.moe/atfp7w.jpg" alt="Vesper Logo" onerror="this.style.display='none'">
+  </div>
+
+  <button onclick="window.open(`/pair`)" class="btn">PAIR CODE</button>
+  <button onclick="window.open(`/qr`)" class="btn">QR SCAN</button>
+  <button onclick="window.open(`https://github.com/Kevintech-hub/Vesper-Xmd/fork`)" class="btn">REPO FORK</button>
+
+</body>
+</html>
