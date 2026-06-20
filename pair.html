@@ -175,37 +175,70 @@
       color: #2ed573;
     }
 
-    /* FIXED: Code display with visible text */
+    /* FIXED: Code display with high visibility */
     .code-display {
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 18px 16px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 20px 16px;
       margin: 10px 0;
-      border: 2px solid rgba(26, 111, 212, 0.4);
+      border: 2px solid rgba(26, 111, 212, 0.5);
+      box-shadow: 0 0 30px rgba(26, 111, 212, 0.15);
     }
 
     .code-text {
-      font-size: 32px;
+      font-size: 36px;
       font-weight: 700;
-      letter-spacing: 6px;
+      letter-spacing: 8px;
       color: #ffffff !important;
       font-family: 'Courier New', monospace;
       cursor: pointer;
       transition: all 0.3s ease;
       background: transparent;
-      text-shadow: 0 0 30px rgba(26, 111, 212, 0.3);
+      text-shadow: 0 0 40px rgba(26, 111, 212, 0.3);
+      display: block;
+      padding: 8px;
+      border-radius: 8px;
     }
 
     .code-text:hover {
       color: #1a6fd4 !important;
-      text-shadow: 0 0 40px rgba(26, 111, 212, 0.6);
+      text-shadow: 0 0 50px rgba(26, 111, 212, 0.6);
+      background: rgba(26, 111, 212, 0.1);
+    }
+
+    .code-text.copied {
+      color: #2ed573 !important;
+      text-shadow: 0 0 40px rgba(46, 213, 115, 0.4);
     }
 
     .copy-hint {
-      color: rgba(255, 255, 255, 0.35);
-      font-size: 11px;
-      margin-top: 6px;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 12px;
+      margin-top: 8px;
       letter-spacing: 1px;
+    }
+
+    .copy-hint span {
+      color: #1a6fd4;
+      font-weight: 600;
+    }
+
+    .copy-btn {
+      margin-top: 10px;
+      padding: 8px 24px;
+      background: rgba(26, 111, 212, 0.2);
+      border: 1px solid rgba(26, 111, 212, 0.3);
+      border-radius: 8px;
+      color: #7eb8ff;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .copy-btn:hover {
+      background: rgba(26, 111, 212, 0.35);
+      border-color: #1a6fd4;
     }
 
     .instructions {
@@ -268,7 +301,7 @@
       .box { padding: 25px 16px 20px; }
       .title { font-size: 18px; }
       .logo-img { width: 70px; height: 70px; }
-      .code-text { font-size: 24px; letter-spacing: 4px; }
+      .code-text { font-size: 26px; letter-spacing: 4px; }
       .input-container { flex-direction: column; border-radius: 14px; background: rgba(255,255,255,0.06); }
       .input-container input { border-radius: 10px; padding: 14px; }
       .input-container button { border-radius: 10px; padding: 12px; width: 100%; }
@@ -279,7 +312,7 @@
 
   <div class="container">
     <div class="box" id="box">
-      <img class="logo-img" src="https://files.catbox.moe/xd8cvb.jpg" alt="Vesper Logo" onerror="this.style.display='none'">
+      <img class="logo-img" src="https://files.catbox.moe/j8fok2.jpg" alt="Vesper Logo" onerror="this.style.display='none'">
 
       <div class="title">🔐 Pair Your Device</div>
       <div class="subtitle">
@@ -292,7 +325,7 @@
       </div>
 
       <div id="pair">
-        <div class="status-msg info">Enter your number to get pairing code</div>
+        <div class="status-msg info">📱 Enter your number to get pairing code</div>
       </div>
 
       <div class="instructions" id="instructions">
@@ -319,26 +352,47 @@
     const submitBtn = document.getElementById("submit");
     const numberInput = document.getElementById("number");
     const instructions = document.getElementById("instructions");
+    let currentCode = '';
 
     function setStatus(message, type = 'info') {
       pairDiv.innerHTML = `<div class="status-msg ${type}">${message}</div>`;
     }
 
-    async function CopyCode() {
+    function displayCode(code) {
+      currentCode = code;
+      pairDiv.innerHTML = `
+        <div class="code-display">
+          <div class="code-text" id="code-text" onclick="copyCode()">${code}</div>
+          <div class="copy-hint">👆 <span>Tap</span> to copy</div>
+          <button class="copy-btn" onclick="copyCode()">📋 Copy Code</button>
+        </div>
+      `;
+      setStatus('✅ Code generated! Follow the instructions below.', 'success');
+      instructions.style.display = "block";
+    }
+
+    async function copyCode() {
       const codeElement = document.getElementById("code-text");
-      if (!codeElement) return;
-      const code = codeElement.getAttribute("data-code");
+      if (!codeElement || !currentCode) return;
+
       try {
-        await navigator.clipboard.writeText(code);
-        const original = codeElement.innerHTML;
+        await navigator.clipboard.writeText(currentCode);
+        codeElement.classList.add('copied');
         codeElement.innerHTML = '✅ COPIED!';
-        codeElement.style.color = '#2ed573 !important';
         setTimeout(() => {
-          codeElement.innerHTML = original;
-          codeElement.style.color = '#ffffff !important';
-        }, 2000);
+          codeElement.classList.remove('copied');
+          codeElement.innerHTML = currentCode;
+        }, 2500);
       } catch (err) {
         console.error('Copy failed:', err);
+        // Fallback method
+        const textArea = document.createElement('textarea');
+        textArea.value = currentCode;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('✅ Code copied to clipboard!');
       }
     }
 
@@ -373,17 +427,7 @@
           return;
         }
 
-        // FIXED: Code now visible with white text
-        pairDiv.innerHTML = `
-          <div class="code-display">
-            <div class="code-text" id="code-text" data-code="${code}" onclick="CopyCode()" style="color:#ffffff !important;">
-              ${code}
-            </div>
-            <div class="copy-hint">👆 Tap to copy</div>
-          </div>
-        `;
-        setStatus('✅ Code generated! Follow the instructions below.', 'success');
-        instructions.style.display = "block";
+        displayCode(code);
 
         // Auto-copy the code
         try {
