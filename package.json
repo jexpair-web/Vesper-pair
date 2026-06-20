@@ -1,28 +1,30 @@
 {
-    "name": "Vesper-Xmd-session",
-    "description": "Vesper-Xmd WhatsApp session generator",
-    "version": "1.0.0",
+    "description": "session",
     "main": "./index.js",
-  "engines" : { 
-    "npm" : ">=9.7.2",
-    "node" : ">=20.0.0"
+    "engines": {
+        "npm": ">=9.7.2",
+        "node": ">=20.0.0"
     },
     "scripts": {
-    "start": "node index.js"
-  },
-  "author": "Kelvin Tech",
-  "license": "GPL-3.0",
-  "dependencies": {
-    "@whiskeysockets/baileys": "https://github.com/Kevintech-hub/JexCore-baileys/archive/refs/tags/V2.0.tar.gz",
-    "qrcode": "^1.5.3",
-    "awesome-phonenumber": "^2.64.0",
-    "pino": "^8.1.0",
-    "phone" : "3.1.30",
-    "jimp" : "1.6.0",
-    "lolcatjs": "^2.4.3",
-    "body-parser": "^1.20.1",
-    "pastebin-js": "^1.0.6",
-    "express": "^4.18.1",
-    "path": "^0.12.7"
-   }
+        "start": "node index.js"
+    },
+    "author": "Sang Lee",
+    "license": "GPL-3.0 license",
+    "dependencies": {
+        "baileys-pro": "latest",
+        "maher-zubair-baileys": "^6.6.5",
+        "@whiskeysockets/baileys": "npm:wileys",
+        "qrcode": "^1.5.3",
+        "awesome-phonenumber": "^2.64.0",
+        "pino": "^8.1.0",
+        "phone": "3.1.30",
+        "body-parser": "^1.20.1",
+        "pastebin-js": "^1.0.6",
+        "express": "^4.18.1",
+        "path": "^0.12.7",
+        "megajs": "1.1.7",
+        "baileys-elite": "latest",
+        "jimp": "^0.16.13",
+        "kango-wa": "^1.0.4"
+    }
 }

@@ -6,7 +6,7 @@
   <title>Vesper-Xmd Session</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
-    * { box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       display: flex;
@@ -15,228 +15,398 @@
       align-items: center;
       min-height: 100vh;
       margin: 0;
-      padding: 20px 0 50px;
+      padding: 20px;
       background: url("https://files.catbox.moe/xd8cvb.jpg");
       background-size: cover;
       background-position: center;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 0;
     }
 
     .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      position: relative;
+      z-index: 1;
       width: 100%;
+      max-width: 420px;
     }
 
     .box {
-      width: 350px;
-      padding: 28px 24px 24px;
+      width: 100%;
+      padding: 35px 28px 30px;
       text-align: center;
-      background-color: rgba(0, 0, 0, 0.88);
-      border-radius: 20px;
-      box-shadow: 0 0 30px rgba(90, 80, 255, 0.5);
-      backdrop-filter: blur(2px);
+      background: rgba(0, 0, 0, 0.92);
+      border-radius: 24px;
+      box-shadow: 0 0 50px rgba(26, 111, 212, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    /* Logo style */
     .logo-img {
-      width: 70px;
-      height: 70px;
-      object-fit: contain;
+      width: 75px;
+      height: 75px;
+      object-fit: cover;
       border-radius: 50%;
-      margin-bottom: 12px;
-      border: 2px solid #1a6fd4;
+      margin-bottom: 16px;
+      border: 3px solid #1a6fd4;
       padding: 4px;
-      background: #0a0a0a;
+      background: rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease;
     }
 
-    #text { color: #f6f5f5; }
+    .logo-img:hover {
+      transform: scale(1.05);
+    }
 
-    .centered-text {
-      color: #e9e4e4;
-      text-align: center;
+    .title {
+      color: #ffffff;
+      font-size: 22px;
+      font-weight: 700;
       margin: 8px 0 4px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      margin: 4px 0 16px;
+      line-height: 1.6;
+    }
+
+    .subtitle span {
+      color: #1a6fd4;
+      font-weight: 600;
     }
 
     .input-container {
       display: flex;
-      background: black;
-      border-radius: 1rem;
-      padding: 0.3rem;
-      gap: 0.3rem;
-      max-width: 300px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      padding: 4px;
+      gap: 4px;
+      max-width: 100%;
       width: 100%;
-      margin: 15px auto;
+      margin: 20px 0 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: border-color 0.3s ease;
+    }
+
+    .input-container:focus-within {
+      border-color: #1a6fd4;
+      box-shadow: 0 0 20px rgba(26, 111, 212, 0.15);
     }
 
     .input-container input {
-      border-radius: 0.8rem 0 0 0.8rem;
-      background: #e8e8e8;
-      box-shadow: inset 13px 13px 10px #dcdcdc, inset -13px -13px 10px #f4f4f4;
+      border-radius: 10px 0 0 10px;
+      background: transparent;
       width: 100%;
       flex-basis: 75%;
-      padding: 1rem;
+      padding: 14px 16px;
       border: none;
-      border-left: 2px solid #ecf2f8;
-      color: #000000;
-      transition: all 0.2s ease-in-out;
+      color: #ffffff;
+      font-size: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .input-container input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
     }
 
     .input-container input:focus {
-      border-left: 2px solid #ecf1f6;
       outline: none;
-      box-shadow: inset 13px 13px 10px #f0f2f3, inset -13px -13px 10px #f4f4f4;
     }
 
     .input-container button {
-      flex-basis: 15%;
-      padding: 1rem;
-      background: #1a6fd4;
+      flex-basis: 25%;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #1a6fd4 0%, #0e4a8a 100%);
       font-weight: 700;
-      letter-spacing: 0.2rem;
       text-transform: uppercase;
       color: white;
       border: none;
-      width: 90%;
-      border-radius: 0 1rem 1rem 0;
+      border-radius: 0 10px 10px 0;
       cursor: pointer;
-      transition: all 0.2s ease-in-out;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+      font-size: 14px;
     }
 
     .input-container button:hover {
-      background: linear-gradient(135deg, #1254a8 0%, #5935ac 100%);
+      background: linear-gradient(135deg, #2680e6 0%, #1254a8 100%);
+      transform: scale(1.02);
+    }
+
+    .input-container button:active {
+      transform: scale(0.97);
+    }
+
+    #pair {
+      margin: 12px 0 0;
+      min-height: 40px;
+    }
+
+    #pair a {
+      color: #ffffff;
+      font-weight: 500;
+    }
+
+    .code-display {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 10px 0;
+      border: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .code-text {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: #ffffff;
+      font-family: 'Courier New', monospace;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .code-text:hover {
+      color: #1a6fd4;
+    }
+
+    .copy-hint {
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 11px;
+      margin-top: 4px;
     }
 
     .instructions {
       display: none;
-      margin-top: 18px;
-      background: rgba(26, 111, 212, 0.15);
-      border: 1px solid rgba(26, 111, 212, 0.4);
-      border-radius: 12px;
-      padding: 14px 16px;
+      margin-top: 20px;
+      background: rgba(26, 111, 212, 0.08);
+      border: 1px solid rgba(26, 111, 212, 0.2);
+      border-radius: 14px;
+      padding: 18px 20px;
       text-align: left;
     }
 
     .instructions p {
-      color: #c8d8f0;
-      font-size: 12px;
-      margin: 0 0 6px;
-      font-weight: bold;
-      letter-spacing: 0.05em;
+      color: #7eb8ff;
+      font-size: 13px;
+      margin: 0 0 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
 
     .instructions ol {
-      color: #d0dff5;
-      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 13px;
       margin: 0;
-      padding-left: 18px;
-      line-height: 1.8;
+      padding-left: 20px;
+      line-height: 2;
     }
 
     .instructions ol li span {
       color: #7eb8ff;
-      font-weight: bold;
+      font-weight: 600;
+    }
+
+    .status-msg {
+      padding: 10px;
+      border-radius: 10px;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+
+    .status-msg.info {
+      background: rgba(26, 111, 212, 0.15);
+      color: #7eb8ff;
+    }
+
+    .status-msg.error {
+      background: rgba(255, 107, 107, 0.15);
+      color: #ff6b6b;
+    }
+
+    .status-msg.success {
+      background: rgba(46, 213, 115, 0.15);
+      color: #2ed573;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 16px;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 13px;
+      text-decoration: none;
+      transition: color 0.3s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .back-btn:hover {
+      color: #ffffff;
     }
 
     footer {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
+      position: relative;
+      z-index: 1;
+      margin-top: 20px;
       text-align: center;
       padding: 10px 0;
-      background: rgba(0, 0, 0, 0.6);
-      color: rgba(255, 255, 255, 0.55);
-      font-size: 12px;
-      letter-spacing: 0.08em;
+      color: rgba(255, 255, 255, 0.2);
+      font-size: 11px;
+      letter-spacing: 2px;
     }
 
-    @media (max-width: 500px) {
-      .box { width: 92%; }
-      .input-container { flex-direction: column; }
-      .input-container input { border-radius: 0.8rem; width: 100%; }
-      .input-container button {
-        padding: 0.8rem;
-        border-radius: 0.8rem;
-        width: 100%;
-      }
+    @media (max-width: 480px) {
+      .box { padding: 25px 16px 20px; }
+      .title { font-size: 18px; }
+      .input-container { flex-direction: column; border-radius: 14px; background: rgba(255,255,255,0.06); }
+      .input-container input { border-radius: 10px; padding: 14px; }
+      .input-container button { border-radius: 10px; padding: 12px; width: 100%; }
+      .code-text { font-size: 22px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="main">
-      <div class="box" id="box">
-        <div id="text">
-          <!-- Logo added here -->
-          <img class="logo-img" src="https://files.catbox.moe/xd8cvb.jpg" alt="Vesper Logo" onerror="this.style.display='none'">
-          <i class="fa fa-user"></i>
-          <h3 class="centered-text">Vesper-Xmd Session</h3>
-          <h6 style="color:#aaa;margin:4px 0;">legally wrong, ethically right, Kelvin Tech vs everyone!</h6>
-          <h6 style="color:#ccc;margin:4px 0 12px;">Enter your number with country code.</h6>
-          <div class="input-container">
-            <input placeholder="2567466xxx" type="number" id="number" name="">
-            <button id="submit">GO</button>
-          </div>
-          <br>
-          <main id="pair"></main>
 
-          <div class="instructions" id="instructions">
-            <p>📋 HOW TO USE YOUR CODE</p>
-            <ol>
-              <li>Open <span>WhatsApp</span> on your phone</li>
-              <li>Tap <span>Linked Devices</span> → <span>Link a Device</span></li>
-              <li>Tap <span>"Link with phone number instead"</span></li>
-              <li>Enter the <span>8-digit code</span> shown above</li>
-              <li>Wait — your <span>session ID</span> will arrive on WhatsApp</li>
-            </ol>
-          </div>
-        </div>
+  <div class="container">
+    <div class="box" id="box">
+      <img class="logo-img" src="https://files.catbox.moe/xd8cvb.jpg" alt="Vesper Logo" onerror="this.style.display='none'">
+
+      <div class="title">🔐 Pair Your Device</div>
+      <div class="subtitle">
+        Enter your WhatsApp number with <span>country code</span>
       </div>
+
+      <div class="input-container">
+        <input placeholder="2567466xxx" type="text" id="number" name="" autocomplete="off">
+        <button id="submit">GO</button>
+      </div>
+
+      <div id="pair">
+        <div class="status-msg info">Enter your number to get pairing code</div>
+      </div>
+
+      <div class="instructions" id="instructions">
+        <p>📋 HOW TO USE YOUR CODE</p>
+        <ol>
+          <li>Open <span>WhatsApp</span> on your phone</li>
+          <li>Tap <span>Settings</span> → <span>Linked Devices</span></li>
+          <li>Tap <span>"Link a Device"</span></li>
+          <li>Tap <span>"Link with phone number instead"</span></li>
+          <li>Enter the <span>8-digit code</span> shown above</li>
+          <li>Wait — your <span>session ID</span> will arrive on WhatsApp</li>
+        </ol>
+      </div>
+
+      <a href="/" class="back-btn">← Back to Home</a>
     </div>
   </div>
 
-  <footer>© JEXPLOITDEV</footer>
+  <footer>© 2024 JexploitDev</footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
   <script>
-    let a = document.getElementById("pair");
-    let b = document.getElementById("submit");
-    let c = document.getElementById("number");
-    let instructions = document.getElementById("instructions");
+    const pairDiv = document.getElementById("pair");
+    const submitBtn = document.getElementById("submit");
+    const numberInput = document.getElementById("number");
+    const instructions = document.getElementById("instructions");
 
-    async function Copy() {
-      let obj = document.getElementById("copy");
-      let original = obj.innerHTML;
-      await navigator.clipboard.writeText(obj.getAttribute("data-code"));
-      obj.innerHTML = '<span style="color:#7eb8ff;font-weight:bold">✔ COPIED!</span>';
-      setTimeout(() => { obj.innerHTML = original; }, 1200);
+    function setStatus(message, type = 'info') {
+      pairDiv.innerHTML = `<div class="status-msg ${type}">${message}</div>`;
     }
 
-    b.addEventListener("click", async (e) => {
+    async function CopyCode() {
+      const codeElement = document.getElementById("code-text");
+      if (!codeElement) return;
+      const code = codeElement.getAttribute("data-code");
+      try {
+        await navigator.clipboard.writeText(code);
+        const original = codeElement.innerHTML;
+        codeElement.innerHTML = '✅ COPIED!';
+        codeElement.style.color = '#2ed573';
+        setTimeout(() => {
+          codeElement.innerHTML = original;
+          codeElement.style.color = '#ffffff';
+        }, 2000);
+      } catch (err) {
+        console.error('Copy failed:', err);
+      }
+    }
+
+    submitBtn.addEventListener("click", async (e) => {
       e.preventDefault();
       instructions.style.display = "none";
-      if (!c.value) {
-        a.innerHTML = '<a style="color:white;font-weight:bold">Enter your WhatsApp number with Country Code</a><br><br>';
-      } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
-        a.innerHTML = '<a style="color:#ff6b6b;font-weight:bold">⚠ Invalid Number</a><br><br>';
-      } else {
-        const Nick = c.value.replace(/[^0-9]/g, "");
-        let bb = "", bbc = "";
-        Nick.split('').forEach(ch => {
-          bbc += ch;
-          bb += (bbc.length == 3 || bbc.length == 8) ? " " + ch : ch;
-        });
-        c.type = "text";
-        c.value = "+" + bb;
-        c.style = "color:black;font-size:18px";
-        a.innerHTML = '<a style="color:#7eb8ff;font-weight:bold">⏳ Please wait...</a><br><br>';
-        let { data } = await axios(`/code?number=${Nick}`);
-        let code = data.code || "Service Unavailable";
-        a.innerHTML = `<font id="copy" data-code="${code}" onclick="Copy()" style="cursor:pointer;color:#ff6b6b;font-weight:bold" size="5">CODE: <span style="color:white;font-weight:bold;letter-spacing:0.15em">${code}</span> <span style="font-size:11px;color:#7eb8ff;">(tap to copy)</span></font><br><br>`;
-        if (data.code) instructions.style.display = "block";
+      const number = numberInput.value.trim();
+
+      if (!number) {
+        setStatus('⚠️ Enter your WhatsApp number with country code', 'error');
+        return;
+      }
+
+      const cleanNumber = number.replace(/[^0-9]/g, "");
+      if (cleanNumber.length < 10) {
+        setStatus('⚠️ Invalid number. Must be at least 10 digits', 'error');
+        return;
+      }
+
+      setStatus('⏳ Generating pairing code...', 'info');
+      numberInput.disabled = true;
+      submitBtn.disabled = true;
+
+      try {
+        const { data } = await axios(`/code?number=${cleanNumber}`);
+        const code = data.code || "Service Unavailable";
+
+        if (code === "Service Unavailable" || !code) {
+          setStatus('❌ Service unavailable. Please try again later.', 'error');
+          numberInput.disabled = false;
+          submitBtn.disabled = false;
+          return;
+        }
+
+        pairDiv.innerHTML = `
+          <div class="code-display">
+            <div class="code-text" id="code-text" data-code="${code}" onclick="CopyCode()">
+              ${code}
+            </div>
+            <div class="copy-hint">👆 Tap to copy</div>
+          </div>
+        `;
+        setStatus('✅ Code generated! Follow the instructions below.', 'success');
+        instructions.style.display = "block";
+
+        // Auto-copy the code
+        try {
+          await navigator.clipboard.writeText(code);
+        } catch (e) {
+          console.log('Auto-copy not supported');
+        }
+
+      } catch (error) {
+        console.error('Pairing error:', error);
+        setStatus('❌ Error: ' + (error.message || 'Please try again'), 'error');
+      } finally {
+        numberInput.disabled = false;
+        submitBtn.disabled = false;
       }
     });
+
+    numberInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        submitBtn.click();
+      }
+    });
+
+    // Initial state
+    setStatus('📱 Enter your number to get pairing code', 'info');
   </script>
 </body>
 </html>

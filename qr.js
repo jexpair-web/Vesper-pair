@@ -20,6 +20,11 @@ function removeFile(FilePath) {
     fs.rmSync(FilePath, { recursive: true, force: true });
 }
 
+// Standard base64 encoding function
+function encodeToBase64(data) {
+    return Buffer.from(data).toString('base64');
+}
+
 router.get('/', async (req, res) => {
     const id = makeid();
 
@@ -56,19 +61,41 @@ router.get('/', async (req, res) => {
                         await client.sendMessage(client.user.id, {
                             text: '⚡ *Vesper-Xmd* ⚡\nGenerating your session, please wait a moment...'
                         });
-                        await delay(50000);
-                        let data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-                        await delay(8000);
-                        let b64data = Buffer.from(data).toString('base64');
-                        let session = await client.sendMessage(client.user.id, { text: 'VESPER-BOT:~' + b64data });
+
+                        await delay(3000);
+
+                        const credsPath = __dirname + `/temp/${id}/creds.json`;
+                        let data = fs.readFileSync(credsPath);
+                        let b64data = encodeToBase64(data);
+
+                        // Send session with standard format
+                        const sessionText = 'VESPER-BOT~' + b64data;
+                        let session = await client.sendMessage(client.user.id, {
+                            text: sessionText
+                        });
+
                         await client.sendMessage(client.user.id, {
-                            text: "```⚡ Vesper-Xmd has been linked to your WhatsApp account!\n\nDo NOT share this session_id with anyone.\n\nCopy and paste it on the SESSION string during deploy — it will be used for authentication.\n\nFor any issues, reach us via:\nhttps://wa.me/message/256755585369\n\nDon't forget to sleep 😴, for even the relentless must recharge ⚡.\n\nGoodluck 🎉 — Vesper-Xmd```"
+                            text: `╭━━━✧ VESPER-XMD SESSION ✧━━━╮
+┃
+┃ ✅ *Session Generated Successfully!*
+┃ 
+┃ 📌 *Format:* VESPER-BOT~[base64]
+┃ 📦 *Size:* ${(b64data.length / 1024).toFixed(2)} KB
+┃ 🔐 *Encoding:* Base64 Standard
+┃
+┃ ⚠️ *Keep this session private!*
+┃
+┃ 📱 *Support:* wa.me/256742932677
+┃ 
+╰━━━━━━━━━━━━━━━━━━━━━━━━╯`
                         }, { quoted: session });
+
                         await delay(500);
                         await client.ws.close();
                         removeFile('./temp/' + id);
+
                     } catch (e) {
-                        console.log('Error sending session messages:', e);
+                        console.log('Error sending session:', e);
                     }
                 } else if (connection === 'close') {
                     const code = lastDisconnect?.error?.output?.statusCode;
