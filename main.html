@@ -1,185 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Vesper-Xmd Session</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<title>Vesper-Xmd Session</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #080b14;
+    --deep: #0e1428;
+    --twilight-1: #1a2148;
+    --twilight-2: #2b1f52;
+    --panel: rgba(13, 17, 34, 0.66);
+    --panel-border: rgba(140, 163, 255, 0.16);
+    --signal: #5b7fff;
+    --signal-soft: #8ca3ff;
+    --ember: #ffb454;
+    --text-1: #f3f5fc;
+    --text-2: #9aa3c4;
+    --text-3: #5c6488;
+    --font-display: 'Sora', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
 
-    body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
-      background-image: url("https://files.catbox.moe/xd8cvb.jpg");
-      background-size: cover;
-      background-position: center;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      position: relative;
-    }
+  * { box-sizing: border-box; }
 
-    body::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      z-index: 0;
-    }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px;
+    font-family: var(--font-body);
+    color: var(--text-1);
+    background:
+      radial-gradient(ellipse 70% 45% at 50% -8%, rgba(91,127,255,0.28), transparent 60%),
+      radial-gradient(ellipse 55% 35% at 92% 105%, rgba(255,180,84,0.10), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 4% 92%, rgba(43,31,82,0.4), transparent 60%),
+      linear-gradient(180deg, var(--void) 0%, var(--deep) 45%, var(--twilight-1) 100%);
+  }
 
-    .container {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      width: 100%;
-      max-width: 450px;
-    }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.5) 0, transparent 100%),
+      radial-gradient(1px 1px at 70% 15%, rgba(255,255,255,0.4) 0, transparent 100%),
+      radial-gradient(1.5px 1.5px at 85% 60%, rgba(255,255,255,0.35) 0, transparent 100%),
+      radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.3) 0, transparent 100%),
+      radial-gradient(1px 1px at 12% 65%, rgba(255,255,255,0.4) 0, transparent 100%),
+      radial-gradient(1px 1px at 55% 45%, rgba(255,255,255,0.25) 0, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-    .logo-container {
-      text-align: center;
-      margin-bottom: 30px;
-    }
+  .stage {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 380px;
+    animation: rise 0.7s ease both;
+  }
 
-    .logo-img {
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 50%;
-      border: 4px solid #1a6fd4;
-      padding: 5px;
-      background: rgba(0, 0, 0, 0.7);
-      box-shadow: 0 0 30px rgba(26, 111, 212, 0.4);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-    .logo-img:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 50px rgba(26, 111, 212, 0.7);
-    }
+  .signal {
+    position: relative;
+    width: 108px;
+    height: 108px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 22px;
+  }
 
-    .brand-name {
-      color: #fff;
-      font-size: 28px;
-      font-weight: 700;
-      margin-top: 12px;
-      text-shadow: 0 0 20px rgba(26, 111, 212, 0.5);
-      letter-spacing: 2px;
-    }
+  .signal::before,
+  .signal::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(91,127,255,0.45);
+    animation: pulse 3.2s ease-out infinite;
+  }
+  .signal::after { animation-delay: 1.6s; }
 
-    .brand-sub {
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 13px;
-      letter-spacing: 4px;
-      margin-top: 4px;
-      text-transform: uppercase;
-    }
+  @keyframes pulse {
+    0% { transform: scale(0.85); opacity: 0.65; }
+    100% { transform: scale(1.9); opacity: 0; }
+  }
 
-    .btn-group {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin-top: 30px;
-    }
+  .logo-img {
+    position: relative;
+    z-index: 1;
+    width: 84px;
+    height: 84px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid rgba(140,163,255,0.5);
+    background: var(--deep);
+    box-shadow: 0 0 26px rgba(91,127,255,0.35);
+  }
 
-    .btn {
-      width: 100%;
-      padding: 0.9em 1.75em;
-      background: linear-gradient(135deg, #1a6fd4 0%, #0e4a8a 100%);
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      transition: all 0.4s ease;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      z-index: 1;
-      font-weight: 600;
-      font-size: 16px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      text-transform: uppercase;
-      color: #ffffff;
-      letter-spacing: 1.5px;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-    }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--signal-soft);
+    margin: 0 0 8px;
+  }
 
-    .btn::after {
-      content: '';
-      display: block;
-      height: 100%;
-      width: 100%;
-      transform: skew(90deg) translate(-50%, -50%);
-      position: absolute;
-      inset: 50%;
-      left: 25%;
-      z-index: -1;
-      transition: 0.5s ease-out;
-      background: #ffffff;
-    }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 26px;
+    margin: 0 0 6px;
+    text-align: center;
+    letter-spacing: -0.01em;
+  }
 
-    .btn:hover::after {
-      transform: skew(45deg) translate(-50%, -50%);
-    }
+  .lede {
+    font-size: 14px;
+    color: var(--text-2);
+    text-align: center;
+    margin: 0 0 30px;
+    max-width: 300px;
+    line-height: 1.5;
+  }
 
-    .btn:hover {
-      color: #0e4a8a;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(26, 111, 212, 0.4);
-    }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
 
-    .btn:active {
-      transform: scale(0.97);
-    }
+  .option-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    backdrop-filter: blur(6px);
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  }
 
-    .btn-icon {
-      font-size: 20px;
-    }
+  .option-card:hover {
+    border-color: rgba(140,163,255,0.5);
+    transform: translateY(-2px);
+    background: rgba(20,26,50,0.75);
+  }
 
-    .footer {
-      position: relative;
-      z-index: 1;
-      margin-top: 40px;
-      color: rgba(255, 255, 255, 0.3);
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
+  .option-card:active { transform: translateY(0) scale(0.99); }
 
-    @media (max-width: 480px) {
-      .logo-img { width: 90px; height: 90px; }
-      .brand-name { font-size: 22px; }
-      .btn { font-size: 14px; padding: 0.8em 1.5em; }
-    }
-  </style>
+  .option-card:focus-visible {
+    outline: 2px solid var(--signal-soft);
+    outline-offset: 2px;
+  }
+
+  .option-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(91,127,255,0.14);
+    color: var(--signal-soft);
+  }
+
+  .option-icon svg { width: 18px; height: 18px; }
+
+  .option-copy { flex: 1; min-width: 0; }
+
+  .option-title {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 14.5px;
+    color: var(--text-1);
+  }
+
+  .option-desc {
+    display: block;
+    font-size: 12px;
+    color: var(--text-3);
+    margin-top: 2px;
+  }
+
+  .option-arrow {
+    flex-shrink: 0;
+    color: var(--text-3);
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+  .option-arrow svg { width: 16px; height: 16px; display: block; }
+
+  .option-card:hover .option-arrow {
+    transform: translateX(2px);
+    color: var(--signal-soft);
+  }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    margin-top: 40px;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stage { animation: none; }
+    .signal::before, .signal::after { animation: none; opacity: 0; }
+  }
+
+  @media (max-width: 420px) {
+    h1 { font-size: 22px; }
+  }
+</style>
 </head>
 <body>
-
-  <div class="container">
-    <div class="logo-container">
-      <img class="logo-img" src="https://files.catbox.moe/j8fok2.jpg" alt="Vesper Logo" onerror="this.style.display='none'">
-      <div class="brand-name">VESPER-XMD</div>
-      <div class="brand-sub">Session Generator</div>
+  <div class="stage">
+    <div class="signal">
+      <img class="logo-img" src="https://files.catbox.moe/atfp7w.jpg" alt="Vesper logo" onerror="this.style.display='none'">
     </div>
 
-    <div class="btn-group">
-      <button onclick="window.open(`/pair`)" class="btn">
-        <span class="btn-icon">🔑</span> Pair Code
+    <p class="eyebrow">Session Link</p>
+    <h1>Connect Vesper to WhatsApp</h1>
+    <p class="lede">Choose how you'd like to link this device to your WhatsApp account.</p>
+
+    <div class="options">
+      <button class="option-card" onclick="window.open('/pair')">
+        <span class="option-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="3.2"/><circle cx="17" cy="12" r="3.2"/><path d="M10.2 12h3.6"/></svg>
+        </span>
+        <span class="option-copy">
+          <span class="option-title">Pair with a code</span>
+          <span class="option-desc">Link using your phone number</span>
+        </span>
+        <span class="option-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </span>
       </button>
-      <button onclick="window.open(`/qr`)" class="btn">
-        <span class="btn-icon">📱</span> QR Scan
+
+      <button class="option-card" onclick="window.open('/qr')">
+        <span class="option-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="3" y="15" width="6" height="6" rx="1"/><rect x="15" y="15" width="2.4" height="2.4"/><rect x="18.6" y="15" width="2.4" height="2.4"/><rect x="15" y="18.6" width="2.4" height="2.4"/><rect x="18.6" y="18.6" width="2.4" height="2.4"/></svg>
+        </span>
+        <span class="option-copy">
+          <span class="option-title">Scan a QR code</span>
+          <span class="option-desc">Open WhatsApp and scan to connect</span>
+        </span>
+        <span class="option-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </span>
       </button>
-      <button onclick="window.open(`https://github.com/Kevintech-hub/Vesper-Xmd/fork`)" class="btn">
-        <span class="btn-icon">⭐</span> Fork Repository
+
+      <button class="option-card" onclick="window.open('https://github.com/Kevintech-hub/Vesper-Xmd/fork')">
+        <span class="option-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="5" r="2.2"/><circle cx="18" cy="5" r="2.2"/><circle cx="12" cy="19" r="2.2"/><path d="M6 7.2v2.3h5.3M18 7.2v2.3h-5.3M12 9.5v7"/></svg>
+        </span>
+        <span class="option-copy">
+          <span class="option-title">Fork the repository</span>
+          <span class="option-desc">Get the source, run your own instance</span>
+        </span>
+        <span class="option-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </span>
       </button>
     </div>
 
-    <div class="footer">© 2024 JexploitDev</div>
+    <footer>© JEXPLOITDEV</footer>
   </div>
-
 </body>
 </html>
