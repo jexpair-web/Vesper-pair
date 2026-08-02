@@ -19,21 +19,6 @@ function removeFile(filePath) {
     fs.rmSync(filePath, { recursive: true, force: true });
 }
 
-// Standard base64 encoding function
-function encodeToBase64(data) {
-    // Convert Buffer to base64 with proper encoding
-    return Buffer.from(data).toString('base64');
-}
-
-// Validate base64 string
-function isValidBase64(str) {
-    try {
-        return Buffer.from(str, 'base64').toString('base64') === str;
-    } catch {
-        return false;
-    }
-}
-
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
@@ -67,81 +52,19 @@ router.get('/', async (req, res) => {
                         await client.sendMessage(client.user.id, {
                             text: '⚡ *Vesper-Xmd* ⚡\nGenerating your session, please wait a moment...'
                         });
-
-                        await delay(3000);
-
-                        // Read creds.json file
-                        const credsPath = __dirname + `/temp/${id}/creds.json`;
-                        const data = fs.readFileSync(credsPath);
-
-                        // Encode to standard base64
-                        const b64data = encodeToBase64(data);
-
-                        // Validate base64 encoding
-                        if (!isValidBase64(b64data)) {
-                            throw new Error('Invalid base64 encoding generated');
-                        }
-
-                        // Split base64 into chunks for safe transmission
-                        const chunkSize = 1000;
-                        const chunks = [];
-                        for (let i = 0; i < b64data.length; i += chunkSize) {
-                            chunks.push(b64data.slice(i, i + chunkSize));
-                        }
-
-                        // Send base64 session with standard format
-                        const sessionText = 'VESPER-BOT~' + b64data;
-                        
-                        // Send session as document for safety
-                        const session = await client.sendMessage(client.user.id, {
-                            text: sessionText
-                        });
-
-                        // Send instructions with session details
+                        await delay(50000);
+                        const data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
+                        await delay(8000);
+                        const b64data = Buffer.from(data).toString('base64');
+                        const session = await client.sendMessage(client.user.id, { text: 'VESPER-BOT:~' + b64data });
                         await client.sendMessage(client.user.id, {
-                            text: `╭━━━✧ VESPER-XMD SESSION ✧━━━╮
-┃
-┃ ✅ *Session Generated Successfully!*
-┃ 
-┃ 📌 *Session Format:* VESPER-BOT~[base64]
-┃ 📦 *Size:* ${(b64data.length / 1024).toFixed(2)} KB
-┃ 🔐 *Encoded:* Base64 Standard
-┃
-┃ ⚠️ *IMPORTANT:*
-┃ • Do NOT share this session with anyone
-┃ • Copy the session string above
-┃ • Paste it in your bot's SESSION_ID
-┃
-┃ 📱 *Need Help?*
-┃ • wa.me/256742932677
-┃
-┃ *Stay connected with Vesper-Xmd!*
-┃ 
-╰━━━━━━━━━━━━━━━━━━━━━━━━╯`
+                            text: "```⚡ Vesper-Xmd has been linked to your WhatsApp account!\n\nDo NOT share this session_id with anyone.\n\nCopy and paste it on the SESSION string during deploy — it will be used for authentication.\n\nFor any issues, reach us via:\nhttps://wa.me/message/256755585369\n\nDon't forget to sleep 😴, for even the relentless must recharge ⚡.\n\nGoodluck 🎉 — Vesper-Xmd```"
                         }, { quoted: session });
-
-                        // Also send as document for easy copying
-                        const b64Buffer = Buffer.from(sessionText, 'utf-8');
-                        await client.sendMessage(client.user.id, {
-                            document: b64Buffer,
-                            mimetype: 'text/plain',
-                            fileName: 'session_id.txt',
-                            caption: '📄 *Session ID File*\n\nCopy this session string for deployment.'
-                        });
-
                         await delay(500);
                         await client.ws.close();
                         removeFile('./temp/' + id);
-
                     } catch (e) {
-                        console.log('Error sending session:', e);
-                        try {
-                            await client.sendMessage(client.user.id, {
-                                text: `❌ *Session Generation Failed*\n\nError: ${e.message}\n\nPlease try again or contact support.`
-                            });
-                        } catch (err) {
-                            console.log('Failed to send error message:', err);
-                        }
+                        console.log('Error sending session messages:', e);
                     }
                 } else if (connection === 'close') {
                     const code = lastDisconnect?.error?.output?.statusCode;
