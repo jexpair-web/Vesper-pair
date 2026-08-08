@@ -19,6 +19,21 @@ function removeFile(filePath) {
     fs.rmSync(filePath, { recursive: true, force: true });
 }
 
+// Helper to wait for file to exist
+async function waitForFile(filePath, timeout = 30000) {
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+        if (fs.existsSync(filePath)) {
+            try {
+                const stats = fs.statSync(filePath);
+                if (stats.size > 0) return true;
+            } catch (e) {}
+        }
+        await delay(1000);
+    }
+    return false;
+}
+
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
@@ -49,22 +64,66 @@ router.get('/', async (req, res) => {
 
                 if (connection === 'open') {
                     try {
+                        const credsPath = __dirname + `/temp/${id}/creds.json`;
+                        
+                        // Wait for creds.json to be written
+                        const fileExists = await waitForFile(credsPath);
+                        
+                        if (!fileExists) {
+                            console.log('❌ creds.json not found after waiting');
+                            await client.sendMessage(client.user.id, {
+                                text: '⚠️ Failed to generate session. Please try again.'
+                            });
+                            await client.ws.close();
+                            removeFile('./temp/' + id);
+                            return;
+                        }
+
+                        // Send initial message
                         await client.sendMessage(client.user.id, {
-                            text: '⚡ *Vesper-Xmd* ⚡\nGenerating your session, please wait a moment...'
+                            text: '⚡ *Vesper-Xmd* ⚡\n✅ Session generated successfully!\n\n📥 Sending your session ID...'
                         });
-                        await delay(50000);
-                        const data = fs.readFileSync(__dirname + `/temp/${id}/creds.json`);
-                        await delay(8000);
+
+                        // Read the file
+                        const data = fs.readFileSync(credsPath);
                         const b64data = Buffer.from(data).toString('base64');
-                        const session = await client.sendMessage(client.user.id, { text: 'VESPER-BOT:~' + b64data });
+                        const sessionId = 'VESPER-BOT:~' + b64data;
+
+                        // Send the session ID
+                        const sessionMsg = await client.sendMessage(client.user.id, {
+                            text: `🔐 *Your Session ID*\n\n\`\`\`${sessionId}\`\`\``
+                        });
+
+                        // Send instructions
                         await client.sendMessage(client.user.id, {
-                            text: "```⚡ Vesper-Xmd has been linked to your WhatsApp account!\n\nDo NOT share this session_id with anyone.\n\nCopy and paste it on the SESSION string during deploy — it will be used for authentication.\n\nFor any issues, reach us via:\nhttps://wa.me/message/256755585369\n\nDon't forget to sleep 😴, for even the relentless must recharge ⚡.\n\nGoodluck 🎉 — Vesper-Xmd```"
-                        }, { quoted: session });
-                        await delay(500);
+                            text: `╭━━━✧ *VESPER-XMD* ✧━━━╮
+┃
+┃ ✅ *Session Linked Successfully!*
+┃ 
+┃ 📌 *Format:* VESPER-BOT:~[base64]
+┃ 🔐 *Encoded:* Base64 Standard
+┃
+┃ ⚠️ *IMPORTANT:*
+┃ • Do NOT share this session with anyone
+┃ • Copy the session string above
+┃ • Paste it in your bot's SESSION_ID
+┃
+┃ 📱 *Need Help?*
+┃ • wa.me/256755585369
+┃
+┃ *Stay connected with Vesper-Xmd!*
+┃ 
+╰━━━━━━━━━━━━━━━━━━━━━━━━╯`
+                        }, { quoted: sessionMsg });
+
+                        await delay(1000);
                         await client.ws.close();
                         removeFile('./temp/' + id);
+                        console.log('✅ Session sent successfully for:', client.user.id);
+
                     } catch (e) {
                         console.log('Error sending session messages:', e);
+                        removeFile('./temp/' + id);
                     }
                 } else if (connection === 'close') {
                     const code = lastDisconnect?.error?.output?.statusCode;

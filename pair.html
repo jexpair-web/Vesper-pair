@@ -208,6 +208,12 @@
     border: 1px solid rgba(91,127,255,0.22);
   }
 
+  .status--success {
+    background: rgba(95,227,196,0.1);
+    color: var(--teal);
+    border: 1px solid rgba(95,227,196,0.25);
+  }
+
   .dot {
     width: 7px;
     height: 7px;
@@ -306,6 +312,40 @@
 
   .instructions strong { color: var(--text-1); font-weight: 600; }
 
+  .session-info {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: rgba(91,127,255,0.08);
+    border: 1px solid rgba(91,127,255,0.15);
+    border-radius: 12px;
+    font-size: 11.5px;
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  .session-info strong {
+    color: var(--text-1);
+  }
+
+  .session-info .highlight {
+    color: var(--ember-soft);
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 14px;
+    color: var(--text-3);
+    font-size: 12px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .back-link:hover {
+    color: var(--signal-soft);
+  }
+
   footer {
     position: fixed;
     bottom: 0;
@@ -343,6 +383,11 @@
     <p class="tagline">legally wrong, ethically right — Kelvin Tech vs everyone.</p>
     <p class="lede">Enter your WhatsApp number with country code to get a pairing code.</p>
 
+    <div class="session-info">
+      💡 After linking, your <strong>session ID</strong> will be sent to your WhatsApp.<br>
+      Format: <span class="highlight">VESPER-BOT:~[base64]</span>
+    </div>
+
     <div class="input-row">
       <input placeholder="2567466xxx" type="number" id="number" name="number" inputmode="numeric" autocomplete="tel">
       <button id="submit">Go</button>
@@ -360,6 +405,8 @@
         <li>Wait — your <strong>session ID</strong> will arrive on WhatsApp</li>
       </ol>
     </div>
+
+    <a href="/" class="back-link">← Back to home</a>
   </div>
 
   <footer>© JEXPLOITDEV</footer>
