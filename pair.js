@@ -1,5 +1,6 @@
 const { makeid } = require('./id');
 const express = require('express');
+const path = require('path');
 const fs = require('fs');
 const pino = require('pino');
 const {
@@ -10,7 +11,7 @@ const {
     makeCacheableSignalKeyStore,
     fetchLatestBaileysVersion,
     DisconnectReason,
-} = require("@whiskeysockets/baileys");
+} = require('@whiskeysockets/baileys');
 
 const router = express.Router();
 
@@ -19,17 +20,11 @@ function removeFile(filePath) {
     fs.rmSync(filePath, { recursive: true, force: true });
 }
 
-// Helper to wait for file to exist
-async function waitForFile(filePath, timeout = 30000) {
-    const start = Date.now();
-    while (Date.now() - start < timeout) {
-        if (fs.existsSync(filePath)) {
-            try {
-                const stats = fs.statSync(filePath);
-                if (stats.size > 0) return true;
-            } catch (e) {}
-        }
-        await delay(1000);
+// Waits until creds.json actually exists on disk (max ~15s)
+async function waitForCreds(credPath, retries = 10, interval = 1500) {
+    for (let i = 0; i < retries; i++) {
+        if (fs.existsSync(credPath)) return true;
+        await delay(interval);
     }
     return false;
 }
@@ -37,9 +32,13 @@ async function waitForFile(filePath, timeout = 30000) {
 router.get('/', async (req, res) => {
     const id = makeid();
     let num = req.query.number;
+    let sessionSent = false; // guard: only send session once
 
     async function JUNEX() {
-        const { state, saveCreds } = await useMultiFileAuthState('./temp/' + id);
+        const tempDir = path.join(process.cwd(), 'temp', id);
+        const credPath = path.join(tempDir, 'creds.json');
+
+        const { state, saveCreds } = await useMultiFileAuthState(tempDir);
         try {
             const { version } = await fetchLatestBaileysVersion();
             const logger = pino({ level: 'silent' });
@@ -53,8 +52,8 @@ router.get('/', async (req, res) => {
                 printQRInTerminal: false,
                 logger,
                 browser: Browsers.ubuntu('Edge'),
-                connectTimeoutMs: 60000,
-                keepAliveIntervalMs: 10000,
+                connectTimeoutMs: 60_000,
+                keepAliveIntervalMs: 10_000,
             });
 
             client.ev.on('creds.update', saveCreds);
@@ -63,71 +62,41 @@ router.get('/', async (req, res) => {
                 const { connection, lastDisconnect } = s;
 
                 if (connection === 'open') {
+                    if (sessionSent) return; // already handled
+                    sessionSent = true;
+
                     try {
-                        const credsPath = __dirname + `/temp/${id}/creds.json`;
-                        
-                        // Wait for creds.json to be written
-                        const fileExists = await waitForFile(credsPath);
-                        
-                        if (!fileExists) {
-                            console.log('❌ creds.json not found after waiting');
-                            await client.sendMessage(client.user.id, {
-                                text: '⚠️ Failed to generate session. Please try again.'
-                            });
-                            await client.ws.close();
-                            removeFile('./temp/' + id);
-                            return;
-                        }
-
-                        // Send initial message
                         await client.sendMessage(client.user.id, {
-                            text: '⚡ *Vesper-Xmd* ⚡\n✅ Session generated successfully!\n\n📥 Sending your session ID...'
+                            text: '⚡ *Vesper-Xmd* ⚡\nGenerating your session, please wait a moment…'
                         });
 
-                        // Read the file
-                        const data = fs.readFileSync(credsPath);
+                        // FIX: wait for creds.json to actually be written (was delay(50000) before!)
+                        const ready = await waitForCreds(credPath);
+                        if (!ready) throw new Error('creds.json was never written to disk');
+
+                        await delay(1500); // tiny buffer for flush
+                        const data = fs.readFileSync(credPath);
                         const b64data = Buffer.from(data).toString('base64');
-                        const sessionId = 'VESPER-BOT:~' + b64data;
 
-                        // Send the session ID
-                        const sessionMsg = await client.sendMessage(client.user.id, {
-                            text: `🔐 *Your Session ID*\n\n\`\`\`${sessionId}\`\`\``
+                        const session = await client.sendMessage(client.user.id, {
+                            text: 'VESPER-BOT:~' + b64data
                         });
 
-                        // Send instructions
                         await client.sendMessage(client.user.id, {
-                            text: `╭━━━✧ *VESPER-XMD* ✧━━━╮
-┃
-┃ ✅ *Session Linked Successfully!*
-┃ 
-┃ 📌 *Format:* VESPER-BOT:~[base64]
-┃ 🔐 *Encoded:* Base64 Standard
-┃
-┃ ⚠️ *IMPORTANT:*
-┃ • Do NOT share this session with anyone
-┃ • Copy the session string above
-┃ • Paste it in your bot's SESSION_ID
-┃
-┃ 📱 *Need Help?*
-┃ • wa.me/256755585369
-┃
-┃ *Stay connected with Vesper-Xmd!*
-┃ 
-╰━━━━━━━━━━━━━━━━━━━━━━━━╯`
-                        }, { quoted: sessionMsg });
+                            text: '```⚡ Vesper-Xmd has been linked to your WhatsApp!\n\n🔐 Do NOT share this session_id with anyone.\n\nCopy and paste it as your SESSION string during deploy.\n\nSupport: https://wa.me/message/256755585369\n\nGoodluck 🎉 — Vesper-Xmd```'
+                        }, { quoted: session });
 
-                        await delay(1000);
+                        await delay(500);
                         await client.ws.close();
-                        removeFile('./temp/' + id);
-                        console.log('✅ Session sent successfully for:', client.user.id);
-
+                        removeFile(tempDir);
                     } catch (e) {
-                        console.log('Error sending session messages:', e);
-                        removeFile('./temp/' + id);
+                        console.error('[pair] Error sending session:', e.message);
+                        removeFile(tempDir);
                     }
+
                 } else if (connection === 'close') {
                     const code = lastDisconnect?.error?.output?.statusCode;
-                    if (code !== DisconnectReason.loggedOut) {
+                    if (!sessionSent && code !== DisconnectReason.loggedOut) {
                         await delay(5000);
                         JUNEX();
                     }
@@ -138,17 +107,13 @@ router.get('/', async (req, res) => {
                 await delay(1500);
                 num = num.replace(/[^0-9]/g, '');
                 const code = await client.requestPairingCode(num);
-                if (!res.headersSent) {
-                    await res.send({ code });
-                }
+                if (!res.headersSent) res.send({ code });
             }
 
         } catch (err) {
-            console.log('Pair service error:', err);
-            removeFile('./temp/' + id);
-            if (!res.headersSent) {
-                await res.send({ code: 'Service Currently Unavailable' });
-            }
+            console.error('[pair] Service error:', err.message);
+            removeFile(tempDir);
+            if (!res.headersSent) res.send({ code: 'Service Currently Unavailable' });
         }
     }
 
