@@ -10,7 +10,7 @@
   "author": "Kevin Tech",
   "license": "GPL-3.0 license",
   "dependencies": {
-    "@whiskeysockets/baileys": "npm:baileys@6.7.21",
+    "@whiskeysockets/baileys": "git+https://lyfe00011-admin@bitbucket.org/lyfe00011/baileys.git"",
     "bcryptjs": "^3.0.2",
     "body-parser": "*",
     "express": "*",
